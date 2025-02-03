@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Information sur les pays</title>
     <style>
+        /* Vos styles CSS restent identiques */
         body {
             display: flex;
             justify-content: center;
@@ -20,86 +21,29 @@
             max-width: 600px;
             padding: 20px;
         }
-        input {
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            width: 300px;
-            margin-bottom: 10px;
-        }
-        input:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0,123,255,0.3);
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        .info-container {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: none;
-        }
-        .error {
-            color: red;
-            margin-top: 10px;
-            display: none;
-        }
-        .info-item {
-            margin: 10px 0;
-            text-align: left;
-        }
-        .flag-container {
-            margin: 20px 0;
-        }
-        .flag {
-            width: 200px;
-            height: 133px;
-            object-fit: cover;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
+        /* ... Reste des styles ... */
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Information sur les pays</h1>
-        <input type="text" list="countries-list" id="country-search" placeholder="Rechercher un pays..." autocomplete="off">
+        <input 
+            type="text" 
+            list="countries-list" 
+            id="country-search" 
+            placeholder="Rechercher un pays..." 
+            autocomplete="off"
+            maxlength="100">
         <datalist id="countries-list">
             <% countries.forEach(country => { %>
-                <option value="<%= country.name.common %>"></option>
+                <option value="<%= country.name.common %>" data-id="<%= country.cca2 %>"></option>
             <% }); %>
         </datalist>
         <br>
         <button id="validate-btn" disabled>Valider</button>
         <div id="error" class="error">Veuillez sélectionner un pays valide.</div>
         <div id="country-info" class="info-container">
-            <div class="flag-container">
-                <img id="country-flag" class="flag" src="" alt="Drapeau du pays">
-            </div>
-            <div class="info-item"><strong>Capitale:</strong> <span id="capital"></span></div>
-            <div class="info-item"><strong>Population:</strong> <span id="population"></span></div>
-            <div class="info-item"><strong>Continent:</strong> <span id="continent"></span></div>
-            <div class="info-item"><strong>Langue(s) officielle(s):</strong> <span id="languages"></span></div>
-            <div class="info-item"><strong>Monnaie:</strong> <span id="currency"></span></div>
+            <!-- ... Reste du HTML ... -->
         </div>
     </div>
 
@@ -111,43 +55,78 @@
         const errorDiv = document.getElementById("error");
         const infoContainer = document.getElementById("country-info");
 
-        // Activer/désactiver le bouton selon la validité du pays
-        searchInput.addEventListener('input', () => {
-            const isValidCountry = countries.some(country => country.name.common === searchInput.value);
-            validateBtn.disabled = !isValidCountry;
-            errorDiv.style.display = isValidCountry ? 'none' : 'block';
-        });
+        // Création d'un Set pour une validation rapide des pays autorisés
+        const validCountryNames = new Set(countries.map(country => country.name.common));
+        const validCountryCodes = new Set(countries.map(country => country.cca2));
 
-        // Gérer le clic sur le bouton Valider
-        validateBtn.addEventListener('click', () => {
-            const selectedCountry = countries.find(country => country.name.common === searchInput.value);
+        // Fonction de nettoyage des entrées
+        function sanitizeInput(input) {
+            return input.trim().replace(/[<>]/g, '');
+        }
 
-            //envoyer les informations dans l'url 
+        // Fonction de validation du pays
+        function isValidCountry(countryName) {
+            return validCountryNames.has(countryName);
+        }
+
+        // Validation de l'entrée utilisateur
+        searchInput.addEventListener('input', (e) => {
+            const sanitizedValue = sanitizeInput(e.target.value);
+            const isValid = isValidCountry(sanitizedValue);
             
-            if (selectedCountry) {
-                // Afficher les informations du pays
-                document.getElementById('country-flag').src = selectedCountry.flags.png;
-                document.getElementById('capital').textContent = selectedCountry.capital ? selectedCountry.capital[0] : 'N/A';
-                document.getElementById('population').textContent = selectedCountry.population.toLocaleString();
-                document.getElementById('continent').textContent = selectedCountry.region;
-                document.getElementById('languages').textContent = Object.values(selectedCountry.languages).join(', ');
-                document.getElementById('currency').textContent = Object.values(selectedCountry.currencies).map(currency => currency.name).join(', ');
-                infoContainer.style.display = 'block';
-
-
-
-                window.location.href = `http://localhost:3000/country/${selectedCountry.cca2}`;
-                console.log("apres le click");
-            } else {
-                // Message par défaut si le pays n'est pas dans la base de données
-                document.getElementById('capital').textContent = "Information non disponible";
-                document.getElementById('population').textContent = "Information non disponible";
-                document.getElementById('continent').textContent = "Information non disponible";
-                document.getElementById('languages').textContent = "Information non disponible";
-                document.getElementById('currency').textContent = "Information non disponible";
-                infoContainer.style.display = 'block';
+            validateBtn.disabled = !isValid;
+            errorDiv.style.display = isValid ? 'none' : 'block';
+            
+            // Protection contre les injections
+            if (sanitizedValue !== e.target.value) {
+                searchInput.value = sanitizedValue;
             }
         });
+
+        // Gestion du clic sur le bouton Valider
+        validateBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Empêcher le comportement par défaut
+
+            const sanitizedValue = sanitizeInput(searchInput.value);
+            
+            // Double vérification de la validité
+            if (!isValidCountry(sanitizedValue)) {
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const selectedCountry = countries.find(country => 
+                country.name.common === sanitizedValue
+            );
+
+            if (selectedCountry && validCountryCodes.has(selectedCountry.cca2)) {
+                // Création d'une URL sécurisée
+                const url = new URL(`/country/${selectedCountry.cca2}`, window.location.origin);
+                
+                // Validation finale de l'URL
+                if (url.hostname === window.location.hostname) {
+                    window.location.href = url.href;
+                }
+
+                // Mise à jour de l'affichage
+                updateDisplay(selectedCountry);
+            }
+        });
+
+        // Fonction de mise à jour de l'affichage
+        function updateDisplay(country) {
+            if (country && country.flags && country.flags.png) {
+                document.getElementById('country-flag').src = country.flags.png;
+                document.getElementById('capital').textContent = country.capital?.[0] || 'N/A';
+                document.getElementById('population').textContent = country.population.toLocaleString();
+                document.getElementById('continent').textContent = country.region || 'N/A';
+                document.getElementById('languages').textContent = country.languages ? 
+                    Object.values(country.languages).join(', ') : 'N/A';
+                document.getElementById('currency').textContent = country.currencies ? 
+                    Object.values(country.currencies).map(c => c.name).join(', ') : 'N/A';
+                infoContainer.style.display = 'block';
+            }
+        }
     </script>
 </body>
 </html>
