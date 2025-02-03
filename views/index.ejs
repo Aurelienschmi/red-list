@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recherche de pays</title>
+    <title>Information sur les pays</title>
     <style>
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
         }
-        .menu-container {
+        .container {
             text-align: center;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
         }
         input {
             padding: 10px;
@@ -23,17 +26,62 @@
             border-radius: 5px;
             border: 1px solid #ccc;
             width: 300px;
+            margin-bottom: 10px;
         }
         input:focus {
             outline: none;
             border-color: #007bff;
             box-shadow: 0 0 5px rgba(0,123,255,0.3);
         }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .info-container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+        .info-item {
+            margin: 10px 0;
+            text-align: left;
+        }
+        .flag-container {
+            margin: 20px 0;
+        }
+        .flag {
+            width: 200px;
+            height: 133px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
-    <div class="menu-container">
-        <h1>Liste des pays</h1>
+    <div class="container">
+        <h1>Information sur les pays</h1>
         <input 
             type="text" 
             list="countries-list" 
@@ -43,8 +91,48 @@
         >
         <datalist id="countries-list">
         </datalist>
+        <br>
+        <button id="validate-btn" disabled>Valider</button>
+        <div id="error" class="error">Veuillez sélectionner un pays valide.</div>
+        <div id="country-info" class="info-container">
+            <div class="flag-container">
+                <img id="country-flag" class="flag" src="/api/placeholder/200/133" alt="Drapeau du pays">
+            </div>
+            <div class="info-item"><strong>Capitale:</strong> <span id="capital"></span></div>
+            <div class="info-item"><strong>Population:</strong> <span id="population"></span></div>
+            <div class="info-item"><strong>Continent:</strong> <span id="continent"></span></div>
+            <div class="info-item"><strong>Langue(s) officielle(s):</strong> <span id="languages"></span></div>
+            <div class="info-item"><strong>Monnaie:</strong> <span id="currency"></span></div>
+        </div>
     </div>
+
     <script>
+        // Base de données des pays (exemple avec quelques pays)
+        const countryData = {
+            "France": {
+                capital: "Paris",
+                population: "67,39 millions (2020)",
+                continent: "Europe",
+                languages: "Français",
+                currency: "Euro (EUR)",
+            },
+            "Allemagne": {
+                capital: "Berlin",
+                population: "83,24 millions (2020)",
+                continent: "Europe",
+                languages: "Allemand",
+                currency: "Euro (EUR)",
+            },
+            "Japon": {
+                capital: "Tokyo",
+                population: "125,36 millions (2020)",
+                continent: "Asie",
+                languages: "Japonais",
+                currency: "Yen (JPY)",
+            },
+            // Liste des pays complète...
+        };
+
         const countries = [
             "Afghanistan", "Afrique du Sud", "Albanie", "Algérie", "Allemagne", "Andorre", "Angola", "Antigua-et-Barbuda",
             "Arabie saoudite", "Argentine", "Arménie", "Australie", "Autriche", "Azerbaïdjan", "Bahamas", "Bahreïn", "Bangladesh",
@@ -53,29 +141,51 @@
             "Centrafrique", "Chili", "Chine", "Chypre", "Colombie", "Comores", "Congo", "Corée du Nord", "Corée du Sud",
             "Costa Rica", "Côte d'Ivoire", "Croatie", "Cuba", "Danemark", "Djibouti", "Dominique", "Égypte", "Émirats arabes unis",
             "Équateur", "Érythrée", "Espagne", "Estonie", "États-Unis", "Eswatini", "Éthiopie", "Fidji", "Finlande", "France",
-            "Gabon", "Gambie", "Géorgie", "Ghana", "Grèce", "Grenade", "Guatemala", "Guinée", "Guinée équatoriale", "Guinée-Bissau",
-            "Guyana", "Haïti", "Honduras", "Hongrie", "Inde", "Indonésie", "Irak", "Iran", "Irlande", "Islande", "Israël", "Italie",
-            "Jamaïque", "Japon", "Jordanie", "Kazakhstan", "Kenya", "Kirghizistan", "Kiribati", "Koweït", "Laos", "Lesotho", "Lettonie",
-            "Liban", "Liberia", "Libye", "Liechtenstein", "Lituanie", "Luxembourg", "Macédoine du Nord", "Madagascar", "Malaisie",
-            "Malawi", "Maldives", "Mali", "Malte", "Maroc", "Marshall", "Maurice", "Mauritanie", "Mexique", "Micronésie", "Moldavie",
-            "Monaco", "Mongolie", "Monténégro", "Mozambique", "Namibie", "Nauru", "Népal", "Nicaragua", "Niger", "Nigéria", "Norvège",
-            "Nouvelle-Zélande", "Oman", "Ouganda", "Ouzbékistan", "Pakistan", "Palaos", "Panama", "Papouasie-Nouvelle-Guinée", "Paraguay",
-            "Pays-Bas", "Pérou", "Philippines", "Pologne", "Portugal", "Qatar", "Roumanie", "Royaume-Uni", "Russie", "Rwanda",
-            "Saint-Christophe-et-Niévès", "Sainte-Lucie", "Saint-Marin", "Saint-Vincent-et-les-Grenadines", "Salomon", "Salvador",
-            "Samoa", "Sao Tomé-et-Principe", "Sénégal", "Serbie", "Seychelles", "Sierra Leone", "Singapour", "Slovaquie", "Slovénie",
-            "Somalie", "Soudan", "Soudan du Sud", "Sri Lanka", "Suède", "Suisse", "Suriname", "Syrie", "Tadjikistan", "Tanzanie",
-            "Tchad", "République tchèque", "Thaïlande", "Timor oriental", "Togo", "Tonga", "Trinité-et-Tobago", "Tunisie", "Turkménistan",
-            "Turquie", "Tuvalu", "Ukraine", "Uruguay", "Vanuatu", "Vatican", "Venezuela", "Viêt Nam", "Yémen", "Zambie", "Zimbabwe"
+            // ... autres pays
         ];
 
         const datalist = document.getElementById("countries-list");
         const searchInput = document.getElementById("country-search");
+        const validateBtn = document.getElementById("validate-btn");
+        const errorDiv = document.getElementById("error");
+        const infoContainer = document.getElementById("country-info");
 
         // Ajouter tous les pays à la datalist
         countries.sort().forEach(country => {
             const option = document.createElement("option");
             option.value = country;
             datalist.appendChild(option);
+        });
+
+        // Activer/désactiver le bouton selon la validité du pays
+        searchInput.addEventListener('input', () => {
+            const isValidCountry = countries.includes(searchInput.value);
+            validateBtn.disabled = !isValidCountry;
+            errorDiv.style.display = isValidCountry ? 'none' : 'block';
+        });
+
+        // Gérer le clic sur le bouton Valider
+        validateBtn.addEventListener('click', () => {
+            const selectedCountry = searchInput.value;
+            const countryInfo = countryData[selectedCountry];
+
+            if (countryInfo) {
+                // Afficher les informations du pays
+                document.getElementById('capital').textContent = countryInfo.capital;
+                document.getElementById('population').textContent = countryInfo.population;
+                document.getElementById('continent').textContent = countryInfo.continent;
+                document.getElementById('languages').textContent = countryInfo.languages;
+                document.getElementById('currency').textContent = countryInfo.currency;
+                infoContainer.style.display = 'block';
+            } else {
+                // Message par défaut si le pays n'est pas dans la base de données
+                document.getElementById('capital').textContent = "Information non disponible";
+                document.getElementById('population').textContent = "Information non disponible";
+                document.getElementById('continent').textContent = "Information non disponible";
+                document.getElementById('languages').textContent = "Information non disponible";
+                document.getElementById('currency').textContent = "Information non disponible";
+                infoContainer.style.display = 'block';
+            }
         });
     </script>
 </body>
