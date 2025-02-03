@@ -82,21 +82,18 @@
 <body>
     <div class="container">
         <h1>Information sur les pays</h1>
-        <input 
-            type="text" 
-            list="countries-list" 
-            id="country-search" 
-            placeholder="Rechercher un pays..."
-            autocomplete="off"
-        >
+        <input type="text" list="countries-list" id="country-search" placeholder="Rechercher un pays..." autocomplete="off">
         <datalist id="countries-list">
+            <% countries.forEach(country => { %>
+                <option value="<%= country.name.common %>"></option>
+            <% }); %>
         </datalist>
         <br>
         <button id="validate-btn" disabled>Valider</button>
         <div id="error" class="error">Veuillez sélectionner un pays valide.</div>
         <div id="country-info" class="info-container">
             <div class="flag-container">
-                <img id="country-flag" class="flag" src="/api/placeholder/200/133" alt="Drapeau du pays">
+                <img id="country-flag" class="flag" src="" alt="Drapeau du pays">
             </div>
             <div class="info-item"><strong>Capitale:</strong> <span id="capital"></span></div>
             <div class="info-item"><strong>Population:</strong> <span id="population"></span></div>
@@ -107,76 +104,40 @@
     </div>
 
     <script>
-        // Base de données des pays (exemple avec quelques pays)
-        const countryData = {
-            "France": {
-                capital: "Paris",
-                population: "67,39 millions (2020)",
-                continent: "Europe",
-                languages: "Français",
-                currency: "Euro (EUR)",
-            },
-            "Allemagne": {
-                capital: "Berlin",
-                population: "83,24 millions (2020)",
-                continent: "Europe",
-                languages: "Allemand",
-                currency: "Euro (EUR)",
-            },
-            "Japon": {
-                capital: "Tokyo",
-                population: "125,36 millions (2020)",
-                continent: "Asie",
-                languages: "Japonais",
-                currency: "Yen (JPY)",
-            },
-            // Liste des pays complète...
-        };
-
-        const countries = [
-            "Afghanistan", "Afrique du Sud", "Albanie", "Algérie", "Allemagne", "Andorre", "Angola", "Antigua-et-Barbuda",
-            "Arabie saoudite", "Argentine", "Arménie", "Australie", "Autriche", "Azerbaïdjan", "Bahamas", "Bahreïn", "Bangladesh",
-            "Barbade", "Belgique", "Belize", "Bénin", "Bhoutan", "Biélorussie", "Birmanie", "Bolivie", "Bosnie-Herzégovine",
-            "Botswana", "Brésil", "Brunei", "Bulgarie", "Burkina Faso", "Burundi", "Cambodge", "Cameroun", "Canada", "Cap-Vert",
-            "Centrafrique", "Chili", "Chine", "Chypre", "Colombie", "Comores", "Congo", "Corée du Nord", "Corée du Sud",
-            "Costa Rica", "Côte d'Ivoire", "Croatie", "Cuba", "Danemark", "Djibouti", "Dominique", "Égypte", "Émirats arabes unis",
-            "Équateur", "Érythrée", "Espagne", "Estonie", "États-Unis", "Eswatini", "Éthiopie", "Fidji", "Finlande", "France",
-            // ... autres pays
-        ];
-
+        const countries = <%- JSON.stringify(countries) %>;
         const datalist = document.getElementById("countries-list");
         const searchInput = document.getElementById("country-search");
         const validateBtn = document.getElementById("validate-btn");
         const errorDiv = document.getElementById("error");
         const infoContainer = document.getElementById("country-info");
 
-        // Ajouter tous les pays à la datalist
-        countries.sort().forEach(country => {
-            const option = document.createElement("option");
-            option.value = country;
-            datalist.appendChild(option);
-        });
-
         // Activer/désactiver le bouton selon la validité du pays
         searchInput.addEventListener('input', () => {
-            const isValidCountry = countries.includes(searchInput.value);
+            const isValidCountry = countries.some(country => country.name.common === searchInput.value);
             validateBtn.disabled = !isValidCountry;
             errorDiv.style.display = isValidCountry ? 'none' : 'block';
         });
 
         // Gérer le clic sur le bouton Valider
         validateBtn.addEventListener('click', () => {
-            const selectedCountry = searchInput.value;
-            const countryInfo = countryData[selectedCountry];
+            const selectedCountry = countries.find(country => country.name.common === searchInput.value);
 
-            if (countryInfo) {
+            //envoyer les informations dans l'url 
+            
+            if (selectedCountry) {
                 // Afficher les informations du pays
-                document.getElementById('capital').textContent = countryInfo.capital;
-                document.getElementById('population').textContent = countryInfo.population;
-                document.getElementById('continent').textContent = countryInfo.continent;
-                document.getElementById('languages').textContent = countryInfo.languages;
-                document.getElementById('currency').textContent = countryInfo.currency;
+                document.getElementById('country-flag').src = selectedCountry.flags.png;
+                document.getElementById('capital').textContent = selectedCountry.capital ? selectedCountry.capital[0] : 'N/A';
+                document.getElementById('population').textContent = selectedCountry.population.toLocaleString();
+                document.getElementById('continent').textContent = selectedCountry.region;
+                document.getElementById('languages').textContent = Object.values(selectedCountry.languages).join(', ');
+                document.getElementById('currency').textContent = Object.values(selectedCountry.currencies).map(currency => currency.name).join(', ');
                 infoContainer.style.display = 'block';
+
+
+
+                window.location.href = `http://localhost:3000/country/${selectedCountry.cca2}`;
+                console.log("apres le click");
             } else {
                 // Message par défaut si le pays n'est pas dans la base de données
                 document.getElementById('capital').textContent = "Information non disponible";

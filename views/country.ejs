@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Information sur le pays</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .info-item {
+            margin: 10px 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Information sur le pays</h1>
+        <div class="info-item"><strong>Nom:</strong> <%= country.description.en %></div>
+        <div class="info-item"><strong>Code:</strong> <%= country.code %></div>
+        <h2>Assessments</h2>
+        <% assessments.forEach(assessment => { %>
+            <div class="info-item"><strong>id</strong> <%= assessment.sis_taxon_id %></div>
+            <div class="info-item"><strong>Year Published:</strong> <%= assessment.year_published %></div>
+            <div class="info-item"><strong>Possibly Extinct:</strong> <%= assessment.possibly_extinct %></div>
+            <div class="info-item"><strong>Possibly Extinct in the Wild:</strong> <%= assessment.possibly_extinct_in_the_wild %></div>
+            <div class="info-item"><strong>URL:</strong> <a href="<%= assessment.url %>"><%= assessment.url %></a></div>
+            <h3>Scopes</h3>
+            <% assessment.scopes.forEach(scope => { %>
+                <div class="info-item"><strong>Scope Description:</strong> <%= scope.description.en %></div>
+                <div class="info-item"><strong>Scope Code:</strong> <%= scope.code %></div>
+            <% }); %>
+        <% }); %>
+    </div>
+</body>
+</html>
