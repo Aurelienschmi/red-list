@@ -30,6 +30,10 @@ This application uses the IUCN Red List API to provide information about endange
 - [Express](https://expressjs.com/) - Fast, unopinionated, minimalist web framework for Node.js
 - [EJS](https://ejs.co/) - Embedded JavaScript templating 
 
+## 👷 Members
+
+Aurelien, Gabriel, Aurelien, Hugo
+
 ## 📜 License
 
 This project is licensed under the ISC License.
