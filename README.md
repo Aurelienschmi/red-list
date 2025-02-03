@@ -1,12 +1,12 @@
 # 🐾 Red List Application
 
-## This application uses the IUCN Red List API to provide information about endangered animals by country.
+This application uses the IUCN Red List API to provide information about endangered animals by country.
 
 ## 🚀 Installation
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/your-username/red-list.git
+    git clone https://github.com/Aurelienschmi/red-list
     ```
 2. Navigate to the project directory:
     ```sh
@@ -28,6 +28,7 @@
 ## 📦 Dependencies
 
 - [Express](https://expressjs.com/) - Fast, unopinionated, minimalist web framework for Node.js
+- [EJS](https://ejs.co/) - Embedded JavaScript templating 
 
 ## 📜 License
 
