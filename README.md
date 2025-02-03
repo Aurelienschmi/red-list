@@ -1,6 +1,6 @@
 # 🐾 Red List Application
 
-This application uses the IUCN Red List API to provide information about endangered animals by country.
+## This application uses the IUCN Red List API to provide information about endangered animals by country.
 
 ## 🚀 Installation
 
