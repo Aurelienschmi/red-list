@@ -2,17 +2,14 @@ const express = require("express");
 const axios = require("axios");
 const dotenv = require("dotenv");
 
-// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
 const port = 3000;
 
-// Configuration du moteur de template EJS
 app.set("view engine", "ejs");
 app.set('views', __dirname + '/views');
 
-// Route pour afficher index.ejs
 app.get("/", async (req, res) => {
   try {
     const response = await axios.get('https://restcountries.com/v3.1/all');
@@ -30,22 +27,44 @@ app.get("/country/:country", async (req, res) => {
     if (!apiKey) {
       throw new Error('API_KEY is not defined in the environment variables');
     }
-
     const response = await axios.get(`https://api.iucnredlist.org/api/v4/countries/${req.params.country}`, {
       headers: {
         Authorization: `${apiKey}`
       }
     });
-    console.log(req.params.country); // Log the country code to understand its structure
     const countryData = response.data;
-    res.render("country", { country: countryData.country, assessments: countryData.assessments });
+
+    // Limit to the first 10 assessments
+    const limitedAssessments = countryData.assessments.slice(0, 10);
+
+    // Fetch detailed information for each species
+    const assessments = await Promise.all(limitedAssessments.map(async (assessment) => {
+      const speciesResponse = await axios.get(`https://api.iucnredlist.org/api/v4/taxa/sis/${assessment.sis_taxon_id}`, {
+        headers: {
+          Authorization: `${apiKey}`
+        }
+      });
+      const speciesData = speciesResponse.data;
+      const commonNames = speciesData.taxon.common_names.reduce((acc, name) => {
+        if (name.language === 'eng') acc.english = name.name;
+        if (name.language === 'fre') acc.french = name.name;
+        return acc;
+      }, { english: 'N/A', french: 'N/A' });
+      return {
+        ...assessment,
+        scientific_name: speciesData.taxon.scientific_name,
+        common_name_english: commonNames.english,
+        common_name_french: commonNames.french
+      };
+    }));
+
+    res.render("country", { country: countryData.country, assessments });
   } catch (error) {
     res.status(500).send('Error fetching country');
     console.error(error);
   }
 });
 
-// Démarrage du serveur
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

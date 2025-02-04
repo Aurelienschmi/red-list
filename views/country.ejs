@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Information sur le pays</title>
+    <title>Espèces menacées</title>
     <style>
         body {
             display: flex;
@@ -27,24 +27,42 @@
             margin: 10px 0;
             text-align: left;
         }
+        .button-container {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Information sur le pays</h1>
-        <div class="info-item"><strong>Nom:</strong> <%= country.description.en %></div>
-        <div class="info-item"><strong>Code:</strong> <%= country.code %></div>
-        <h2>Assessments</h2>
+        <div class="button-container">
+            <button onclick="window.location.href='/'">Choisir un autre pays</button>
+        </div>
+        <h1>Espèces menacées</h1>
         <% assessments.forEach(assessment => { %>
-            <div class="info-item"><strong>id</strong> <%= assessment.sis_taxon_id %></div>
-            <div class="info-item"><strong>Year Published:</strong> <%= assessment.year_published %></div>
-            <div class="info-item"><strong>Possibly Extinct:</strong> <%= assessment.possibly_extinct %></div>
-            <div class="info-item"><strong>Possibly Extinct in the Wild:</strong> <%= assessment.possibly_extinct_in_the_wild %></div>
+            <div class="info-item"><strong>ID:</strong> <%= assessment.sis_taxon_id %></div>
+            <div class="info-item"><strong>Nom scientifique:</strong> <%= assessment.scientific_name %></div>
+            <div class="info-item"><strong>Nom commun (anglais):</strong> <%= assessment.common_name_english %></div>
+            <div class="info-item"><strong>Nom commun (français):</strong> <%= assessment.common_name_french %></div>
+            <div class="info-item"><strong>Année de publication:</strong> <%= assessment.year_published %></div>
+            <div class="info-item"><strong>Possiblement éteint:</strong> <%= assessment.possibly_extinct %></div>
+            <div class="info-item"><strong>Possiblement éteint à l'état sauvage:</strong> <%= assessment.possibly_extinct_in_the_wild %></div>
             <div class="info-item"><strong>URL:</strong> <a href="<%= assessment.url %>"><%= assessment.url %></a></div>
             <h3>Scopes</h3>
             <% assessment.scopes.forEach(scope => { %>
-                <div class="info-item"><strong>Scope Description:</strong> <%= scope.description.en %></div>
-                <div class="info-item"><strong>Scope Code:</strong> <%= scope.code %></div>
+                <div class="info-item"><strong>Description du scope:</strong> <%= scope.description.en %></div>
+                <div class="info-item"><strong>Code du scope:</strong> <%= scope.code %></div>
             <% }); %>
         <% }); %>
     </div>

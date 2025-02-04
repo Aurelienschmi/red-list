@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Information sur les pays</title>
     <style>
-        /* Vos styles CSS restent identiques */
         body {
             display: flex;
             justify-content: center;
@@ -21,7 +20,49 @@
             max-width: 600px;
             padding: 20px;
         }
-        /* ... Reste des styles ... */
+        .info-container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .info-item {
+            margin: 10px 0;
+            text-align: left;
+        }
+        .flag {
+            width: 200px;
+            height: 133px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -43,7 +84,17 @@
         <button id="validate-btn" disabled>Valider</button>
         <div id="error" class="error">Veuillez sélectionner un pays valide.</div>
         <div id="country-info" class="info-container">
-            <!-- ... Reste du HTML ... -->
+            <div class="flag-container">
+                <img id="country-flag" class="flag" src="" alt="Drapeau du pays">
+            </div>
+            <div class="info-item"><strong>Capitale:</strong> <span id="capital"></span></div>
+            <div class="info-item"><strong>Population:</strong> <span id="population"></span></div>
+            <div class="info-item"><strong>Continent:</strong> <span id="continent"></span></div>
+            <div class="info-item"><strong>Langue(s) officielle(s):</strong> <span id="languages"></span></div>
+            <div class="info-item"><strong>Monnaie:</strong> <span id="currency"></span></div>
+            <div class="button-container">
+                <button id="species-btn">Voir les espèces menacées</button>
+            </div>
         </div>
     </div>
 
@@ -54,6 +105,7 @@
         const validateBtn = document.getElementById("validate-btn");
         const errorDiv = document.getElementById("error");
         const infoContainer = document.getElementById("country-info");
+        const speciesBtn = document.getElementById("species-btn");
 
         // Création d'un Set pour une validation rapide des pays autorisés
         const validCountryNames = new Set(countries.map(country => country.name.common));
@@ -100,14 +152,6 @@
             );
 
             if (selectedCountry && validCountryCodes.has(selectedCountry.cca2)) {
-                // Création d'une URL sécurisée
-                const url = new URL(`/country/${selectedCountry.cca2}`, window.location.origin);
-                
-                // Validation finale de l'URL
-                if (url.hostname === window.location.hostname) {
-                    window.location.href = url.href;
-                }
-
                 // Mise à jour de l'affichage
                 updateDisplay(selectedCountry);
             }
@@ -125,6 +169,11 @@
                 document.getElementById('currency').textContent = country.currencies ? 
                     Object.values(country.currencies).map(c => c.name).join(', ') : 'N/A';
                 infoContainer.style.display = 'block';
+
+                // Mettre à jour l'URL du bouton Voir les espèces menacées
+                speciesBtn.onclick = () => {
+                    window.location.href = `/country/${country.cca2}`;
+                };
             }
         }
     </script>
