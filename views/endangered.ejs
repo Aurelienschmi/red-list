@@ -62,15 +62,12 @@
         <h1>Espèces menacées</h1>
         <% assessments.forEach(assessment => { %>
             <div class="assessment">
-                <h3>Espèce</h3>
-                <div class="info-item"><strong>ID:</strong> <%= assessment.sis_taxon_id %></div>
-                <div class="info-item"><strong>Nom scientifique:</strong> <%= assessment.scientific_name %></div>
+                <h3> <a href="<%= assessment.url %>"> <%= assessment.scientific_name %> </a></h3>
                 <div class="info-item"><strong>Nom commun (anglais):</strong> <%= assessment.common_name_english %></div>
                 <div class="info-item"><strong>Nom commun (français):</strong> <%= assessment.common_name_french %></div>
                 <div class="info-item"><strong>Année de publication:</strong> <%= assessment.year_published %></div>
                 <div class="info-item"><strong>Possiblement éteint:</strong> <%= assessment.possibly_extinct %></div>
                 <div class="info-item"><strong>Possiblement éteint à l'état sauvage:</strong> <%= assessment.possibly_extinct_in_the_wild %></div>
-                <div class="info-item"><strong>URL:</strong> <a href="<%= assessment.url %>"><%= assessment.url %></a></div>
             </div>
         <% }); %>
     </div>
