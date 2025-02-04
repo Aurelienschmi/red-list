@@ -19,11 +19,17 @@ This application uses the IUCN Red List API to provide information about endange
 
 ## 📖 Usage
 
-1. Start the server:
+1. Create a [.env](http://_vscodecontentref_/3) file in the root directory of the project and add your IUCN Red List API key:
+    ```properties
+    API_KEY=your_api_key_here
+    ```
+   You can obtain an API key by creating an account on the [IUCN Red List website](https://www.iucnredlist.org/).
+
+2. Start the server:
     ```sh
     node index.js 
     ```
-2. Open your browser and go to `http://localhost:3000` to see the application in action.
+3. Open your browser and go to `http://localhost:3000` to see the application in action.
 
 ## 📦 Dependencies
 
