@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Information sur les pays</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         body {
             display: flex;
@@ -14,11 +15,9 @@
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
         }
-        .container {
-            text-align: center;
-            width: 90%;
-            max-width: 600px;
-            padding: 20px;
+        #map {
+            width: 100%;
+            height: 100vh;
         }
         .info-container {
             margin-top: 20px;
@@ -66,116 +65,27 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Information sur les pays</h1>
-        <input 
-            type="text" 
-            list="countries-list" 
-            id="country-search" 
-            placeholder="Rechercher un pays..." 
-            autocomplete="off"
-            maxlength="100">
-        <datalist id="countries-list">
-            <% countries.forEach(country => { %>
-                <option value="<%= country.name.common %>" data-id="<%= country.cca2 %>"></option>
-            <% }); %>
-        </datalist>
-        <br>
-        <button id="validate-btn" disabled>Valider</button>
-        <div id="error" class="error">Veuillez sélectionner un pays valide.</div>
-        <div id="country-info" class="info-container">
-            <div class="flag-container">
-                <img id="country-flag" class="flag" src="" alt="Drapeau du pays">
-            </div>
-            <div class="info-item"><strong>Capitale:</strong> <span id="capital"></span></div>
-            <div class="info-item"><strong>Population:</strong> <span id="population"></span></div>
-            <div class="info-item"><strong>Continent:</strong> <span id="continent"></span></div>
-            <div class="info-item"><strong>Langue(s) officielle(s):</strong> <span id="languages"></span></div>
-            <div class="info-item"><strong>Monnaie:</strong> <span id="currency"></span></div>
-            <div class="button-container">
-                <button id="species-btn">Voir les espèces menacées</button>
-            </div>
-        </div>
-    </div>
+    <div id="map"></div>
 
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
         const countries = <%- JSON.stringify(countries) %>;
-        const datalist = document.getElementById("countries-list");
-        const searchInput = document.getElementById("country-search");
-        const validateBtn = document.getElementById("validate-btn");
-        const errorDiv = document.getElementById("error");
-        const infoContainer = document.getElementById("country-info");
-        const speciesBtn = document.getElementById("species-btn");
 
-        // Création d'un Set pour une validation rapide des pays autorisés
-        const validCountryNames = new Set(countries.map(country => country.name.common));
-        const validCountryCodes = new Set(countries.map(country => country.cca2));
+        // Initialize the map
+        const map = L.map('map').setView([20, 0], 2);
 
-        // Fonction de nettoyage des entrées
-        function sanitizeInput(input) {
-            return input.trim().replace(/[<>]/g, '');
-        }
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-        // Fonction de validation du pays
-        function isValidCountry(countryName) {
-            return validCountryNames.has(countryName);
-        }
-
-        // Validation de l'entrée utilisateur
-        searchInput.addEventListener('input', (e) => {
-            const sanitizedValue = sanitizeInput(e.target.value);
-            const isValid = isValidCountry(sanitizedValue);
-            
-            validateBtn.disabled = !isValid;
-            errorDiv.style.display = isValid ? 'none' : 'block';
-            
-            // Protection contre les injections
-            if (sanitizedValue !== e.target.value) {
-                searchInput.value = sanitizedValue;
+        // Add country markers
+        countries.forEach(country => {
+            if (country.latlng) {
+                const marker = L.marker(country.latlng).addTo(map);
+                marker.bindPopup(`<b>${country.name.common}</b><br><button onclick="window.location.href='/country/${country.cca2}'">Voir les espèces menacées</button>`);
             }
         });
-
-        // Gestion du clic sur le bouton Valider
-        validateBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Empêcher le comportement par défaut
-
-            const sanitizedValue = sanitizeInput(searchInput.value);
-            
-            // Double vérification de la validité
-            if (!isValidCountry(sanitizedValue)) {
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            const selectedCountry = countries.find(country => 
-                country.name.common === sanitizedValue
-            );
-
-            if (selectedCountry && validCountryCodes.has(selectedCountry.cca2)) {
-                // Mise à jour de l'affichage
-                updateDisplay(selectedCountry);
-            }
-        });
-
-        // Fonction de mise à jour de l'affichage
-        function updateDisplay(country) {
-            if (country && country.flags && country.flags.png) {
-                document.getElementById('country-flag').src = country.flags.png;
-                document.getElementById('capital').textContent = country.capital?.[0] || 'N/A';
-                document.getElementById('population').textContent = country.population.toLocaleString();
-                document.getElementById('continent').textContent = country.region || 'N/A';
-                document.getElementById('languages').textContent = country.languages ? 
-                    Object.values(country.languages).join(', ') : 'N/A';
-                document.getElementById('currency').textContent = country.currencies ? 
-                    Object.values(country.currencies).map(c => c.name).join(', ') : 'N/A';
-                infoContainer.style.display = 'block';
-
-                // Mettre à jour l'URL du bouton Voir les espèces menacées
-                speciesBtn.onclick = () => {
-                    window.location.href = `/country/${country.cca2}`;
-                };
-            }
-        }
     </script>
 </body>
 </html>

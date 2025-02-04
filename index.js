@@ -10,6 +10,8 @@ const port = 3000;
 app.set("view engine", "ejs");
 app.set('views', __dirname + '/views');
 
+app.use(express.static('public'));
+
 app.get("/", async (req, res) => {
   try {
     const response = await axios.get('https://restcountries.com/v3.1/all');
@@ -47,7 +49,7 @@ app.get("/country/:country", async (req, res) => {
       const speciesData = speciesResponse.data;
       const commonNames = speciesData.taxon.common_names.reduce((acc, name) => {
         if (name.language === 'eng') acc.english = name.name;
-        if (name.language === 'fre') acc.french = name.name;
+        if (name.language === 'fra') acc.french = name.name;
         return acc;
       }, { english: 'N/A', french: 'N/A' });
       return {
