@@ -1,0 +1,10 @@
+{
+    "code-duplication": {
+        "budget": {
+            "fail": {
+                "percentage": 15,
+                "percentageTokens": 15
+            }
+        }
+    }
+}
