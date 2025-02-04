@@ -17,15 +17,25 @@
         .container {
             text-align: center;
             width: 90%;
-            max-width: 600px;
+            max-width: 800px;
             padding: 20px;
             background-color: white;
             border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .info-item {
             margin: 10px 0;
             text-align: left;
+        }
+        .assessment {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .assessment h3 {
+            margin-top: 0;
         }
         .button-container {
             margin-top: 20px;
@@ -51,20 +61,27 @@
         </div>
         <h1>Espèces menacées</h1>
         <% assessments.forEach(assessment => { %>
-            <div class="info-item"><strong>ID:</strong> <%= assessment.sis_taxon_id %></div>
-            <div class="info-item"><strong>Nom scientifique:</strong> <%= assessment.scientific_name %></div>
-            <div class="info-item"><strong>Nom commun (anglais):</strong> <%= assessment.common_name_english %></div>
-            <div class="info-item"><strong>Nom commun (français):</strong> <%= assessment.common_name_french %></div>
-            <div class="info-item"><strong>Année de publication:</strong> <%= assessment.year_published %></div>
-            <div class="info-item"><strong>Possiblement éteint:</strong> <%= assessment.possibly_extinct %></div>
-            <div class="info-item"><strong>Possiblement éteint à l'état sauvage:</strong> <%= assessment.possibly_extinct_in_the_wild %></div>
-            <div class="info-item"><strong>URL:</strong> <a href="<%= assessment.url %>"><%= assessment.url %></a></div>
-            <h3>Scopes</h3>
-            <% assessment.scopes.forEach(scope => { %>
-                <div class="info-item"><strong>Description du scope:</strong> <%= scope.description.en %></div>
-                <div class="info-item"><strong>Code du scope:</strong> <%= scope.code %></div>
-            <% }); %>
+            <div class="assessment">
+                <h3>Espèce</h3>
+                <div class="info-item"><strong>ID:</strong> <%= assessment.sis_taxon_id %></div>
+                <div class="info-item"><strong>Nom scientifique:</strong> <%= assessment.scientific_name %></div>
+                <div class="info-item"><strong>Nom commun (anglais):</strong> <%= assessment.common_name_english %></div>
+                <div class="info-item"><strong>Nom commun (français):</strong> <%= assessment.common_name_french %></div>
+                <div class="info-item"><strong>Année de publication:</strong> <%= assessment.year_published %></div>
+                <div class="info-item"><strong>Possiblement éteint:</strong> <%= assessment.possibly_extinct %></div>
+                <div class="info-item"><strong>Possiblement éteint à l'état sauvage:</strong> <%= assessment.possibly_extinct_in_the_wild %></div>
+                <div class="info-item"><strong>URL:</strong> <a href="<%= assessment.url %>"><%= assessment.url %></a></div>
+            </div>
         <% }); %>
     </div>
+    <script>
+        // Store data in local storage
+        const country = "<%= country %>";
+        const assessments = <%- JSON.stringify(assessments) %>;
+        localStorage.setItem(`endangered_${country}`, JSON.stringify(assessments));
+
+        // Log assessments to the console
+        console.log(assessments);
+    </script>
 </body>
 </html>

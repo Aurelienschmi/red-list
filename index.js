@@ -1,11 +1,13 @@
 const express = require("express");
 const axios = require("axios");
 const dotenv = require("dotenv");
+const NodeCache = require("node-cache");
 
 dotenv.config();
 
 const app = express();
 const port = 3000;
+const cache = new NodeCache({ stdTTL: 3600 });
 
 app.set("view engine", "ejs");
 app.set('views', __dirname + '/views');
@@ -41,11 +43,18 @@ app.get("/country/:country", async (req, res) => {
 
 app.get("/country/:country/endangered", async (req, res) => {
   try {
+    const country = req.params.country;
+    const cachedData = cache.get(country);
+
+    if (cachedData) {
+      return res.render("endangered", { country: cachedData.country.name.common, assessments: cachedData.assessments });
+    }
+
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
       throw new Error('API_KEY is not defined in the environment variables');
     }
-    const response = await axios.get(`https://api.iucnredlist.org/api/v4/countries/${req.params.country}`, {
+    const response = await axios.get(`https://api.iucnredlist.org/api/v4/countries/${country}`, {
       headers: {
         Authorization: `${apiKey}`
       }
@@ -76,7 +85,10 @@ app.get("/country/:country/endangered", async (req, res) => {
       };
     }));
 
-    res.render("endangered", { country: countryData.country, assessments });
+    // Cache the data
+    cache.set(country, { country: { name: { common: country } }, assessments });
+
+    res.render("endangered", { country: country, assessments });
   } catch (error) {
     res.status(500).send('Error fetching endangered species');
     console.error(error);
