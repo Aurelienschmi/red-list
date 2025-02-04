@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espèces menacées</title>
+    <title>Information sur le pays</title>
     <style>
         body {
             display: flex;
@@ -27,6 +27,18 @@
             margin: 10px 0;
             text-align: left;
         }
+        .info-item img {
+            display: block;
+            margin: 0 auto;
+            width: 150px;
+            height: auto;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .info-item strong {
+            display: inline-block;
+            width: 150px;
+        }
         .button-container {
             margin-top: 20px;
         }
@@ -38,6 +50,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin: 5px;
         }
         button:hover {
             background-color: #0056b3;
@@ -46,25 +59,32 @@
 </head>
 <body>
     <div class="container">
+        <h1>Information sur le pays</h1>
+        <div class="info-item">
+            <img src="<%= country.flags.svg %>" alt="Drapeau de <%= country.name.common %>">
+        </div>
+        <div class="info-item">
+            <strong>Nom:</strong> <%= country.name.common %>
+        </div>
+        <div class="info-item">
+            <strong>Capitale:</strong> <%= country.capital %>
+        </div>
+        <div class="info-item">
+            <strong>Population:</strong> <%= country.population.toLocaleString() %>
+        </div>
+        <div class="info-item">
+            <strong>Continent:</strong> <%= country.region %>
+        </div>
+        <div class="info-item">
+            <strong>Langue(s) officielle(s):</strong> <%= Object.values(country.languages).join(', ') %>
+        </div>
+        <div class="info-item">
+            <strong>Monnaie:</strong> <%= Object.values(country.currencies).map(c => c.name).join(', ') %>
+        </div>
         <div class="button-container">
+            <button onclick="window.location.href='/country/<%= country.cca2 %>/endangered'">Voir les espèces menacées</button>
             <button onclick="window.location.href='/'">Choisir un autre pays</button>
         </div>
-        <h1>Espèces menacées</h1>
-        <% assessments.forEach(assessment => { %>
-            <div class="info-item"><strong>ID:</strong> <%= assessment.sis_taxon_id %></div>
-            <div class="info-item"><strong>Nom scientifique:</strong> <%= assessment.scientific_name %></div>
-            <div class="info-item"><strong>Nom commun (anglais):</strong> <%= assessment.common_name_english %></div>
-            <div class="info-item"><strong>Nom commun (français):</strong> <%= assessment.common_name_french %></div>
-            <div class="info-item"><strong>Année de publication:</strong> <%= assessment.year_published %></div>
-            <div class="info-item"><strong>Possiblement éteint:</strong> <%= assessment.possibly_extinct %></div>
-            <div class="info-item"><strong>Possiblement éteint à l'état sauvage:</strong> <%= assessment.possibly_extinct_in_the_wild %></div>
-            <div class="info-item"><strong>URL:</strong> <a href="<%= assessment.url %>"><%= assessment.url %></a></div>
-            <h3>Scopes</h3>
-            <% assessment.scopes.forEach(scope => { %>
-                <div class="info-item"><strong>Description du scope:</strong> <%= scope.description.en %></div>
-                <div class="info-item"><strong>Code du scope:</strong> <%= scope.code %></div>
-            <% }); %>
-        <% }); %>
     </div>
 </body>
 </html>

@@ -29,6 +29,22 @@ app.get("/country/:country", async (req, res) => {
     if (!apiKey) {
       throw new Error('API_KEY is not defined in the environment variables');
     }
+    const response = await axios.get(`https://restcountries.com/v3.1/alpha/${req.params.country}`);
+    const countryData = response.data[0];
+
+    res.render("country", { country: countryData });
+  } catch (error) {
+    res.status(500).send('Error fetching country');
+    console.error(error);
+  }
+});
+
+app.get("/country/:country/endangered", async (req, res) => {
+  try {
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+      throw new Error('API_KEY is not defined in the environment variables');
+    }
     const response = await axios.get(`https://api.iucnredlist.org/api/v4/countries/${req.params.country}`, {
       headers: {
         Authorization: `${apiKey}`
@@ -60,11 +76,16 @@ app.get("/country/:country", async (req, res) => {
       };
     }));
 
-    res.render("country", { country: countryData.country, assessments });
+    res.render("endangered", { country: countryData.country, assessments });
   } catch (error) {
-    res.status(500).send('Error fetching country');
+    res.status(500).send('Error fetching endangered species');
     console.error(error);
   }
+});
+
+// Redirect invalid URLs to the base URL
+app.use((req, res) => {
+  res.redirect('/');
 });
 
 app.listen(port, () => {

@@ -8,7 +8,7 @@
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
             margin: 0;
@@ -19,27 +19,28 @@
             width: 100%;
             height: 100vh;
         }
-        .info-container {
-            margin-top: 20px;
-            padding: 20px;
+        .search-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
             background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: none;
-        }
-        .info-item {
-            margin: 10px 0;
-            text-align: left;
-        }
-        .flag {
-            width: 200px;
-            height: 133px;
-            object-fit: cover;
-            border: 1px solid #ddd;
+            padding: 10px;
             border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000; /* Ensure the search container is above the map */
         }
-        .button-container {
-            margin-top: 20px;
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 300px;
+            margin-bottom: 10px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
         }
         button {
             padding: 10px 20px;
@@ -49,6 +50,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin: 10px;
         }
         button:hover {
             background-color: #0056b3;
@@ -65,11 +67,31 @@
     </style>
 </head>
 <body>
+    <div class="search-container">
+        <input 
+            type="text" 
+            list="countries-list" 
+            id="country-search" 
+            placeholder="Rechercher un pays..." 
+            autocomplete="off"
+            maxlength="100">
+        <datalist id="countries-list">
+            <% countries.forEach(country => { %>
+                <option value="<%= country.name.common %>" data-id="<%= country.cca2 %>"></option>
+            <% }); %>
+        </datalist>
+        <br>
+        <button id="validate-btn" disabled>Valider</button>
+        <div id="error" class="error">Veuillez sélectionner un pays valide.</div>
+    </div>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
         const countries = <%- JSON.stringify(countries) %>;
+        const searchInput = document.getElementById("country-search");
+        const validateBtn = document.getElementById("validate-btn");
+        const errorDiv = document.getElementById("error");
 
         // Initialize the map
         const map = L.map('map').setView([20, 0], 2);
@@ -84,6 +106,21 @@
             if (country.latlng) {
                 const marker = L.marker(country.latlng).addTo(map);
                 marker.bindPopup(`<b>${country.name.common}</b><br><button onclick="window.location.href='/country/${country.cca2}'">Voir les espèces menacées</button>`);
+            }
+        });
+
+        // Validate country input
+        searchInput.addEventListener('input', () => {
+            const isValidCountry = countries.some(country => country.name.common === searchInput.value);
+            validateBtn.disabled = !isValidCountry;
+            errorDiv.style.display = isValidCountry ? 'none' : 'block';
+        });
+
+        // Handle validate button click
+        validateBtn.addEventListener('click', () => {
+            const selectedCountry = countries.find(country => country.name.common === searchInput.value);
+            if (selectedCountry) {
+                window.location.href = `/country/${selectedCountry.cca2}`;
             }
         });
     </script>
