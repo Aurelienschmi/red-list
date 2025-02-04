@@ -6,5 +6,8 @@
                 "percentageTokens": 15
             }
         }
+    },
+    "require-time": {
+        "entrypoint": "./index.js"
     }
 }

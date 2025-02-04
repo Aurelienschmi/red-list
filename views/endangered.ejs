@@ -15,11 +15,21 @@
         <% assessments.forEach(assessment => { %>
             <div class="assessment">
                 <h3> <a href="<%= assessment.url %>"> <%= assessment.scientific_name %> </a></h3>
-                <div class="info-item"><strong>Nom commun (anglais):</strong> <%= assessment.common_name_english %></div>
-                <div class="info-item"><strong>Nom commun (français):</strong> <%= assessment.common_name_french %></div>
-                <div class="info-item"><strong>Année de publication:</strong> <%= assessment.year_published %></div>
-                <div class="info-item"><strong>Possiblement éteint:</strong> <%= assessment.possibly_extinct %></div>
-                <div class="info-item"><strong>Possiblement éteint à l'état sauvage:</strong> <%= assessment.possibly_extinct_in_the_wild %></div>
+                <% if (assessment.common_name_english) { %>
+                    <div class="info-item"><strong>Nom commun (anglais):</strong> <%= assessment.common_name_english %></div>
+                <% } %>
+                <% if (assessment.common_name_french) { %>
+                    <div class="info-item"><strong>Nom commun (français):</strong> <%= assessment.common_name_french %></div>
+                <% } %>
+                <% if (assessment.year_published) { %>
+                    <div class="info-item"><strong>Année de publication:</strong> <%= assessment.year_published %></div>
+                <% } %>
+                <% if (assessment.possibly_extinct) { %>
+                    <div class="info-item"><strong>Possiblement éteint:</strong> <%= assessment.possibly_extinct %></div>
+                <% } %>
+                <% if (assessment.possibly_extinct_in_the_wild) { %>
+                    <div class="info-item"><strong>Possiblement éteint à l'état sauvage:</strong> <%= assessment.possibly_extinct_in_the_wild %></div>
+                <% } %>
             </div>
         <% }); %>
     </div>
