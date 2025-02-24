@@ -10,7 +10,7 @@ const port = 3000;
 const cache = new NodeCache({ stdTTL: 3600 });
 
 app.set("view engine", "ejs");
-app.set('views', __dirname + '/views');
+app.set('views', __dirname);
 
 app.use(express.static('public'));
 
