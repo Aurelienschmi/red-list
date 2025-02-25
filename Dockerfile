@@ -10,7 +10,9 @@ COPY public ./public
 COPY src ./src
 COPY test ./test
 
-# RUN npm run test
+ENV API_KEY=${API_KEY}
+
+EXPOSE 3000
 
 ENTRYPOINT [ "npm" ]
 CMD [ "run", "dev" ]
