@@ -14,6 +14,22 @@ app.set('views', __dirname);
 
 app.use(express.static('public'));
 
+const git = simpleGit();
+
+
+app.get("/version", async (req, res) => {
+    try {
+        const log = await git.log();
+        const latestCommit = log.latest;
+        res.json({ commit: latestCommit.hash });
+    } catch (error) {
+        console.error("Erreur:", error);
+        res.status(500).send("Erreur lors de la récupération du commit.");
+    }
+});
+
+
+
 app.get("/", async (req, res) => {
   try {
     const response = await axios.get('https://restcountries.com/v3.1/all');
