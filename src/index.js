@@ -14,6 +14,8 @@ app.set('views', __dirname);
 
 app.use(express.static('public'));
 
+const simpleGit = require('simple-git');
+
 const git = simpleGit();
 
 
