@@ -6,7 +6,7 @@ const NodeCache = require("node-cache");
 dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = 80;
 const cache = new NodeCache({ stdTTL: 3600 });
 
 app.set("view engine", "ejs");
