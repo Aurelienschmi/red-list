@@ -62,6 +62,8 @@ Cette application utilise l'API de l'IUCN Red List pour fournir des informations
   [GitHub](https://github.com/Charly-miaouu)
 - **Mathis Dacacio**
   [GitHub](https://github.com/MathisDacacio)
+  **Louis Verbrugge**
+  [GitHub](https://github.com/Louis-Verbrugge)
 
 ## 📜 License
 
